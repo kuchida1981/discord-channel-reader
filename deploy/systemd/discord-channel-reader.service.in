@@ -1,0 +1,19 @@
+[Unit]
+Description=Discord channel reader (VOICEVOX)
+Requires=@VOICEVOX_UNIT@
+After=@VOICEVOX_UNIT@ network-online.target pipewire-pulse.service
+Wants=network-online.target pipewire-pulse.service
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+WorkingDirectory=@REPO_PATH@
+EnvironmentFile=%h/.config/discord-channel-reader/env
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do curl -sf @VOICEVOX_URL@/version >/dev/null && exit 0; sleep 2; done; exit 1'
+ExecStart=@REPO_PATH@/.venv/bin/python -m discord_channel_reader
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
