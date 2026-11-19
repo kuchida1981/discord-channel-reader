@@ -19,6 +19,13 @@ chmod 600 ~/.config/discord-channel-reader/env
 $EDITOR ~/.config/discord-channel-reader/env   # DISCORD_BOT_TOKEN と TARGET_CHANNEL_ID を設定
 ```
 
+特定ユーザーのメッセージだけ読み上げたい場合は、任意で `ALLOWED_USER_IDS` を設定する(カンマ区切り。空なら制限なし)。
+ユーザー ID は、開発者モードをオンにした状態でユーザーを右クリックし「ユーザーIDをコピー」で取得できる。
+
+```
+ALLOWED_USER_IDS=123456789012345678,987654321098765432
+```
+
 ## 3. 環境構築と動作確認
 
 ```

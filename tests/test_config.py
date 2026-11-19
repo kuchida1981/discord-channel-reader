@@ -50,3 +50,30 @@ def test_invalid(env):
 def test_token_not_in_repr():
     c = Config.from_env({"DISCORD_BOT_TOKEN": "SECRET", "TARGET_CHANNEL_ID": "1"})
     assert "SECRET" not in repr(c)
+
+
+BASE = {"DISCORD_BOT_TOKEN": "t", "TARGET_CHANNEL_ID": "1"}
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        (None, frozenset()),
+        ("", frozenset()),
+        ("   ", frozenset()),
+        ("123456789012345678", frozenset({123456789012345678})),
+        ("1,2,3", frozenset({1, 2, 3})),
+        (" 1 , 2 ,, 3, ", frozenset({1, 2, 3})),
+    ],
+)
+def test_allowed_user_ids(raw, expected):
+    env = dict(BASE)
+    if raw is not None:
+        env["ALLOWED_USER_IDS"] = raw
+    assert Config.from_env(env).allowed_user_ids == expected
+
+
+@pytest.mark.parametrize("raw", ["abc", "1,x", "1;2", "1 2"])
+def test_allowed_user_ids_invalid(raw):
+    with pytest.raises(ConfigError):
+        Config.from_env({**BASE, "ALLOWED_USER_IDS": raw})

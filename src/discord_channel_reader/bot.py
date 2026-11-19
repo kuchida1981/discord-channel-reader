@@ -57,12 +57,21 @@ class ReaderClient(discord.Client):
         await super().close()
 
     async def on_ready(self) -> None:
-        log.info("ログイン完了: %s / 対象チャンネル=%s", self.user, self.config.target_channel_id)
+        allowed = self.config.allowed_user_ids
+        log.info(
+            "ログイン完了: %s / 対象チャンネル=%s / 対象ユーザー=%s",
+            self.user,
+            self.config.target_channel_id,
+            f"{len(allowed)}人 {sorted(allowed)}" if allowed else "制限なし",
+        )
 
     def should_read(self, message: discord.Message) -> bool:
         if message.channel.id != self.config.target_channel_id:
             return False
         if self.user is not None and message.author.id == self.user.id:
+            return False
+        allowed = self.config.allowed_user_ids
+        if allowed and message.author.id not in allowed:
             return False
         if message.author.bot or message.webhook_id is not None:
             return self.config.read_bot_messages

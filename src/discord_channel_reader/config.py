@@ -39,6 +39,22 @@ def _int(env: Mapping[str, str], key: str, default: int, minimum: int = 1) -> in
     return v
 
 
+def _user_ids(env: Mapping[str, str], key: str) -> frozenset[int]:
+    raw = env.get(key)
+    if raw is None or raw.strip() == "":
+        return frozenset()
+    ids: set[int] = set()
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            ids.add(int(part))
+        except ValueError:
+            raise ConfigError(f"{key} は整数のカンマ区切りで指定してください") from None
+    return frozenset(ids)
+
+
 @dataclass(frozen=True)
 class Config:
     # トークンは repr に出さない
@@ -52,6 +68,7 @@ class Config:
     queue_max: int = 20
     player_command: str = "paplay"
     mute_file: Path = field(default_factory=default_mute_file)
+    allowed_user_ids: frozenset[int] = frozenset()
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> Config:
@@ -77,4 +94,5 @@ class Config:
             max_chars=_int(env, "MAX_CHARS", 200),
             queue_max=_int(env, "QUEUE_MAX", 20),
             player_command=(env.get("PLAYER_COMMAND") or "paplay").strip(),
+            allowed_user_ids=_user_ids(env, "ALLOWED_USER_IDS"),
         )

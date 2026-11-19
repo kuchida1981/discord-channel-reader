@@ -35,6 +35,8 @@ make unmute   # 再開
 
 `deploy/env.example` を参照。トークンは `~/.config/discord-channel-reader/env` (`chmod 600`) のみに置く。
 
+特定ユーザーの発言だけ読み上げるには `ALLOWED_USER_IDS` にカンマ区切りでユーザー ID を指定する(空なら全員対象)。ID は Discord の開発者モードをオンにし、ユーザーを右クリック →「ユーザーIDをコピー」で取得できる。
+
 ## Terraform を採用しなかった理由
 
 - Discord Bot の作成・サーバーへの招待には API がなく、手動作業になる(`docs/setup.md` 参照)。Terraform で管理できる範囲が実質ない。
